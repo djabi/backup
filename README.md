@@ -39,15 +39,19 @@ Placed in the root of the source tree to be backed up:
 ```toml
 store = "/path/to/backup/store"
 name = "My Backup Project"
-ignores = [
-    "*.log",
-    "build/",
-    "tmp/*.tmp"
-]
 ```
 
 **2. Store Configuration (`.backup/store.toml`)**
 Placed in the root of the backup store. This file is automatically created when you initialize a store (e.g., `backup-cli --store ./my-store ...`). It allows specific CLI commands to run from within the store directory without specifying the `--store` flag.
+
+### Ignoring Files
+
+The tool supports ignoring files and directories using `.gitignore` and `.backupignore` files.
+
+- It respects standard `.gitignore` patterns.
+- It also looks for `.backupignore` files.
+- `.backupignore` takes precedence over `.gitignore` if both exist in the same directory.
+- These files are respected recursively.
 
 ### Commands
 
