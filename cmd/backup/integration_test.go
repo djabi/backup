@@ -22,6 +22,9 @@ func TestIntegration(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	binPath := filepath.Join(tempDir, "backup-cli")
+	if runtime.GOOS == "windows" {
+		binPath += ".exe"
+	}
 	cmd := exec.Command("go", "build", "-o", binPath, ".")
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("Failed to build binary: %v\nOutput: %s", err, string(out))

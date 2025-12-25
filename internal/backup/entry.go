@@ -109,6 +109,9 @@ func (e *FileEntry) Save() error {
 	if err := gw.Close(); err != nil {
 		return err
 	}
+	if err := out.Close(); err != nil {
+		return err
+	}
 
 	return os.Rename(tempDest, dest)
 }
@@ -180,6 +183,9 @@ func (e *LinkEntry) Save() error {
 		return err
 	}
 	if err := gw.Close(); err != nil {
+		return err
+	}
+	if err := out.Close(); err != nil {
 		return err
 	}
 
@@ -418,6 +424,9 @@ func (e *DirectoryEntry) Save() error {
 		return err
 	}
 	if err := gw.Close(); err != nil {
+		return err
+	}
+	if err := out.Close(); err != nil {
 		return err
 	}
 
