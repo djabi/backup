@@ -105,10 +105,12 @@ func (r *BackupRoot) LocateDirectory(fullName string) (*BackupDirectory, error) 
 	}
 
 	// Split path into components
-	// TODO: Handle different separators if verifying across OS?
-	// For now assume standard path separators.
-	// Clean path to remove leading/trailing slashes and resolve . / ..
-	cleanPath := filepath.Clean(fullName)
+	// Handle cross-OS paths by normalizing separators:
+	// 1. Replace all backslashes with forward slashes to handle Windows paths on Linux
+	// 2. Use filepath.Clean to resolve . and .. and normalize separators to local OS
+	normalized := strings.ReplaceAll(fullName, "\\", "/")
+	cleanPath := filepath.Clean(normalized)
+
 	if cleanPath == "." {
 		return current, nil
 	}
@@ -150,7 +152,11 @@ func (r *BackupRoot) Locate(fullName string) (BackupEntry, error) {
 		return nil, err
 	}
 
-	cleanPath := filepath.Clean(fullName)
+	// Normalize separators to handle cross-OS paths:
+	// 1. Replace all backslashes with forward slashes
+	// 2. Use filepath.Clean to resolve . and .. and normalize separators to local OS
+	normalized := strings.ReplaceAll(fullName, "\\", "/")
+	cleanPath := filepath.Clean(normalized)
 	if cleanPath == "." {
 		return current, nil
 	}
