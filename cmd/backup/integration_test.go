@@ -6,8 +6,10 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
+
 	"time"
 )
 
@@ -231,39 +233,43 @@ func TestIntegration(t *testing.T) {
 
 	// 8b. Scenario: Restore Symlink
 	t.Log("--- Scenario 8b: Restore Symlink ---")
-	// Create a symlink and back it up
-	linkPath := filepath.Join(srcDir, "mylink")
-	if err := os.Symlink("file1.txt", linkPath); err != nil {
-		t.Fatal(err)
-	}
-
-	// Backup again to catch the link
-	out = run(srcDir, "backup")
-	snapshot3 := parseSnapshotID(t, out)
-
-	// Verify status doesn't panic with symlink
-	out = run(srcDir, "status")
-	if !strings.Contains(out, "mylink") {
-		t.Logf("Status output: %s", out)
-		// It might be "StatusArchived" or similar. Just checking it doesn't panic and output exists.
-	}
-
-	// Restore link
-	// Remove link first
-	os.Remove(linkPath)
-	run(srcDir, "restore", snapshot3, "mylink")
-
-	// Verify restored is a link
-	info, err := os.Lstat(linkPath)
-	if err != nil {
-		t.Errorf("Failed to stat restored link: %v", err)
+	if runtime.GOOS == "windows" {
+		t.Log("Skipping symlink test on Windows")
 	} else {
-		if info.Mode()&os.ModeSymlink == 0 {
-			t.Errorf("Restored file is not a symlink")
+		// Create a symlink and back it up
+		linkPath := filepath.Join(srcDir, "mylink")
+		if err := os.Symlink("file1.txt", linkPath); err != nil {
+			t.Fatal(err)
 		}
-		target, _ := os.Readlink(linkPath)
-		if target != "file1.txt" {
-			t.Errorf("Restored link target mismatch. Got %s, want file1.txt", target)
+
+		// Backup again to catch the link
+		out = run(srcDir, "backup")
+		snapshot3 := parseSnapshotID(t, out)
+
+		// Verify status doesn't panic with symlink
+		out = run(srcDir, "status")
+		if !strings.Contains(out, "mylink") {
+			t.Logf("Status output: %s", out)
+			// It might be "StatusArchived" or similar. Just checking it doesn't panic and output exists.
+		}
+
+		// Restore link
+		// Remove link first
+		os.Remove(linkPath)
+		run(srcDir, "restore", snapshot3, "mylink")
+
+		// Verify restored is a link
+		info, err := os.Lstat(linkPath)
+		if err != nil {
+			t.Errorf("Failed to stat restored link: %v", err)
+		} else {
+			if info.Mode()&os.ModeSymlink == 0 {
+				t.Errorf("Restored file is not a symlink")
+			}
+			target, _ := os.Readlink(linkPath)
+			if target != "file1.txt" {
+				t.Errorf("Restored link target mismatch. Got %s, want file1.txt", target)
+			}
 		}
 	}
 
