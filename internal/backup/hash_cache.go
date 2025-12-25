@@ -46,7 +46,7 @@ func (hc *HashCache) FileHash(path string) (string, error) {
 	}
 
 	// Ensure we use the right separator for the key?
-	// Java canonical path usually creates system dependent separators.
+
 	// If we want to be ultra safe we can force one style, but let's stick to system default.
 	key := fmt.Sprintf("%d %d %s", info.ModTime().UnixNano()/1000000, info.Size(), relPath)
 

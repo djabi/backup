@@ -163,7 +163,6 @@ func (b *Backup) runStatus(latest *BackupRoot, current *DirectoryEntry, backupDi
 		name := entry.Name()
 		var status BackupStatus = StatusUnknown
 
-		// Re-implementing Java Logic carefully
 		inLatest := false
 		if backupEntries != nil {
 			_, inLatest = backupEntries[name]

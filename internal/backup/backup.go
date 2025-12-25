@@ -315,7 +315,7 @@ func (b *Backup) FindBackupRoot(name string) (*BackupRoot, error) {
 }
 
 func (b *Backup) BackupDirectory(hash, name string) *BackupDirectory {
-	// In Java this was cached in a map.
+
 	// For now new instance is fine as long as it's stateless representation of that hash.
 	// The content loading is inside BackupDirectory.
 	return NewBackupDirectory(b, hash, name)

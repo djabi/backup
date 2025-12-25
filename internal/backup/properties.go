@@ -29,7 +29,7 @@ func LoadProperties(path string) (Properties, error) {
 		}
 		parts := strings.SplitN(line, "=", 2)
 		if len(parts) == 2 {
-			// Handle basic escaping for spaces in keys which Java Properties does
+
 			key := strings.TrimSpace(parts[0])
 			key = strings.ReplaceAll(key, "\\ ", " ")
 
@@ -50,7 +50,6 @@ func (p Properties) Store(path string, comments string) error {
 	if comments != "" {
 		fmt.Fprintf(file, "#%s\n", comments)
 	}
-	// TODO: Add timestamp like Java does? Not strictly necessary.
 
 	// Sort keys for deterministic output
 	keys := make([]string, 0, len(p))

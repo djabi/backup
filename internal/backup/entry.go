@@ -354,7 +354,6 @@ func (e *DirectoryEntry) ContentAsText() (string, error) {
 			typeChar = "L"
 		}
 
-		// Java: typeChar + " " + hash + " " + name + "\n"
 		sb.WriteString(fmt.Sprintf("%s %s %s\n", typeChar, h, child.Name()))
 	}
 	return sb.String(), nil

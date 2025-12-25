@@ -354,7 +354,7 @@ func runTree(b *backup.Backup, rootName string) error {
 
 	// Just print content text for now (not recursive tree yet, unless requested?)
 	// User request: "list the file in a give backup root"
-	// Java "ListCommand" commented out `backupRoot.topDirectory().entries().size();`
+
 	// but the description said "Lists the backup root timestamps".
 	// The user now asks for "list the file".
 	// Let's print the directory content (one level or recursive?).
