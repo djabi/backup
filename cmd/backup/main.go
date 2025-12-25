@@ -404,6 +404,17 @@ func runBackup(b *backup.Backup) error {
 		return fmt.Errorf("%s", msg)
 	}
 
+	// Ensure READMEs exist (auto-fix for existing setups)
+	if err := ensureSourceReadme(b.BackupConfigDir); err != nil {
+		// Non-fatal warning
+		fmt.Fprintf(os.Stderr, "Warning: Failed to create source README: %v\n", err)
+	}
+	if b.StoreRoot != "" {
+		if err := ensureStoreReadme(b.StoreRoot); err != nil {
+			fmt.Fprintf(os.Stderr, "Warning: Failed to create store README: %v\n", err)
+		}
+	}
+
 	fmt.Println("Starting backup...")
 	if b.DryRun {
 		fmt.Println("Running in dry-run mode")
@@ -655,6 +666,9 @@ func runInitStore(path string) error {
 	os.MkdirAll(filepath.Join(absPath, "snapshots"), 0755)
 
 	fmt.Printf("Initialized backup store at %s\n", absPath)
+	if err := ensureStoreReadme(absPath); err != nil {
+		fmt.Printf("Warning: Failed to create README: %v\n", err)
+	}
 	return nil
 }
 
@@ -705,5 +719,54 @@ func runInit(path, store, project string) error {
 	}
 
 	fmt.Printf("Initialized backup source at %s (project: %s)\n", absPath, project)
+	if err := ensureSourceReadme(backupDir); err != nil {
+		fmt.Printf("Warning: Failed to create README: %v\n", err)
+	}
 	return nil
+}
+
+func ensureSourceReadme(backupDir string) error {
+	readmePath := filepath.Join(backupDir, "README.md")
+	if _, err := os.Stat(readmePath); err == nil {
+		return nil // Already exists
+	}
+
+	content := `# Backup Source
+
+This directory is configured as a backup source.
+
+## Configuration
+Configuration is stored in ` + "`config.toml`" + `.
+
+## Usage
+- **Backup**: Run ` + "`backup`" + ` in this directory.
+- **Restore**: Run ` + "`backup restore <snapshot_id>`" + `.
+- **List Snapshots**: Run ` + "`backup snapshots`" + `.
+
+For more information, visit: https://github.com/djabi/backup
+`
+	return os.WriteFile(readmePath, []byte(content), 0644)
+}
+
+func ensureStoreReadme(storeRoot string) error {
+	readmePath := filepath.Join(storeRoot, "README.md")
+	if _, err := os.Stat(readmePath); err == nil {
+		return nil // Already exists
+	}
+
+	content := `# Backup Store
+
+This directory is a backup store containing deduplicated data and snapshots.
+
+## Structure
+- ` + "`data/`" + `: Contains content-addressed data blobs.
+- ` + "`snapshots/`" + `: Contains snapshot references organized by project.
+
+## Usage
+- **Initialize Source**: ` + "`backup init --store <path/to/this/store>`" + `
+- **List All Backups**: ` + "`backup snapshots --store <path/to/this/store>`" + `
+
+For more information, visit: https://github.com/djabi/backup
+`
+	return os.WriteFile(readmePath, []byte(content), 0644)
 }

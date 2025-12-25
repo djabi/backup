@@ -798,6 +798,48 @@ func TestIntegration(t *testing.T) {
 	// Verify prune ran by checking the remove output
 	// Previous logic ran explicit prune, now we just check the remove command output
 	// which should attempt to prune.
+
+	// 24. Scenario: Verify README creation
+	t.Log("--- Scenario 24: Verify README creation ---")
+	// Check Source README
+	sourceReadme := filepath.Join(srcDir, ".backup", "README.md")
+	if _, err := os.Stat(sourceReadme); os.IsNotExist(err) {
+		t.Error("Source README not created during init")
+	} else {
+		content, _ := os.ReadFile(sourceReadme)
+		if !strings.Contains(string(content), "Backup Source") {
+			t.Error("Source README content mismatch")
+		}
+	}
+
+	// Check Store README
+	storeReadme := filepath.Join(storeDir, "README.md")
+	if _, err := os.Stat(storeReadme); os.IsNotExist(err) {
+		t.Error("Store README not created during init")
+	} else {
+		content, _ := os.ReadFile(storeReadme)
+		if !strings.Contains(string(content), "Backup Store") {
+			t.Error("Store README content mismatch")
+		}
+	}
+
+	// 25. Scenario: Retroactive README creation on backup command
+	t.Log("--- Scenario 25: Retroactive README creation ---")
+	// Delete READMEs
+	os.Remove(sourceReadme)
+	os.Remove(storeReadme)
+
+	// Run backup
+	run(srcDir, "backup")
+
+	// Verify recreated
+	if _, err := os.Stat(sourceReadme); os.IsNotExist(err) {
+		t.Error("Source README not recreated during backup")
+	}
+	if _, err := os.Stat(storeReadme); os.IsNotExist(err) {
+		t.Error("Store README not recreated during backup")
+	}
+
 	// Since we are running in a fresh context where this snap was the only one referring to unique content,
 	// it should have pruned.
 	// However, depending on test timing/state, maybe nothing was pruned if deduplication happened?

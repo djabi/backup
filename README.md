@@ -63,11 +63,17 @@ To initialize a new backup store:
 backup-cli init-store [path]
 ```
 
+This will also generate a `README.md` in the store directory with usage instructions.
+
+
 To initialize a new source directory (project):
 
 ```bash
 backup-cli init [path] --store <store-path> --project <project-name>
 ```
+
+This will configure the directory as a backup source and generate a `README.md` in the `.backup` directory.
+
 
 If flags are omitted, the tool will prompt interactively.
 
