@@ -1,0 +1,199 @@
+# Go Backup Tool
+
+A simple and efficient incremental backup tool written in Go.
+
+## Overview
+
+This tool allows you to create snapshots of a directory structure, storing them in a content-addressable storage format. It supports incremental backups (deduplication), **symbolic links**, listing backup history, inspecting backup contents, checking the status of your current workspace against the latest backup, and **hash cache verification** for data integrity.
+
+## Installation
+
+To build and install the tool, run the provided install script:
+
+```bash
+./install.sh
+```
+
+This will compile the project and install the binary as `backup-cli` to your `$GOPATH/bin` (or `$GOBIN`).
+
+## Store Structure
+The backup store uses a Content-Addressable Storage (CAS) model to efficiently deduplicate data.
+
+- `store/data`: Contains the actual file content and directory listings.
+  - Blobs are stored as gzipped files.
+  - filenames are the MD5 hash of the uncompressed content.
+  - Sharded by the first 2 characters of the hash (e.g., `store/data/a1/a1b2c3...`).
+- `store/snapshots`: Contains the snapshot references.
+  - Organized by project name and timestamp: `store/snapshots/<ProjectName>/<Timestamp>`.
+  - Each snapshot file contains the hash of the root directory for that backup.
+
+## Usage
+
+### Configuration
+
+The tool uses a configuration file to locate the backup store and define project settings.
+
+**1. Source Configuration (`.backup/config.toml`)**
+Placed in the root of the source tree to be backed up:
+
+```toml
+store = "/path/to/backup/store"
+name = "My Backup Project"
+ignores = [
+    "*.log",
+    "build/",
+    "tmp/*.tmp"
+]
+```
+
+**2. Store Configuration (`.backup/store.toml`)**
+Placed in the root of the backup store. This file is automatically created when you initialize a store (e.g., `backup-cli --store ./my-store ...`). It allows specific CLI commands to run from within the store directory without specifying the `--store` flag.
+
+### Commands
+
+#### Initialization
+
+To initialize a new backup store:
+
+```bash
+backup-cli init-store [path]
+```
+
+To initialize a new source directory (project):
+
+```bash
+backup-cli init [path] --store <store-path> --project <project-name>
+```
+
+If flags are omitted, the tool will prompt interactively.
+
+#### Create a Backup
+
+To create a new backup snapshot:
+
+```bash
+backup-cli backup
+```
+
+Use `--dry-run` to simulate the backup without writing any changes.
+
+#### List Snapshots
+
+To list all available backup snapshots:
+
+```bash
+backup-cli snapshots
+# or
+backup-cli snapshot
+```
+
+#### List Snapshot Contents
+
+To list the contents of the latest backup:
+
+```bash
+backup-cli tree
+```
+
+To list the contents of a specific backup:
+
+```bash
+backup-cli tree <timestamp>
+```
+
+### `Check Status`
+
+To see what has changed in your working directory compared to the latest backup:
+
+```bash
+backup-cli status
+```
+
+- **Source Mode**: Shows files changed, new, or missing since the last backup. Output is sorted alphabetically.
+- **Headless Mode**: Lists all projects in the store, sorted by recency, with smart relative timestamps (e.g., "Just now", "2 hours ago").
+
+#### `Restore Backup`
+
+To restore files from a snapshot:
+
+```bash
+backup-cli restore <snapshot> [path] [destination]
+```
+
+- If running from source directory: destination defaults to current directory.
+- If running from source directory: destination defaults to current directory.
+- If running from store directory (headless): **destination is strict**. You must provide a destination path, otherwise the command will fail with an error.
+- `[path]` (optional): Restore a specific file or directory from the snapshot.
+
+#### `Check Store Integrity`
+
+To verify the integrity of the backup store:
+
+```bash
+backup-cli check
+```
+
+- `--deep`: Perform a deep check by verifying content hashes (slower).
+
+The `check` command verifies:
+- Store structure integrity
+- Blob references and reachability
+- Hash cache integrity (when run from a source directory)
+- Content hash validation (with `--deep` flag)
+
+#### `Prune Store`
+
+To remove unreferenced blobs and reclaim disk space:
+
+```bash
+backup-cli prune
+```
+
+- `--dry-run`: Show what would be deleted without actually removing any files.
+The command also scans for and reports unreferenced blobs (blobs not referenced by any existing snapshot). If unreferenced blobs are found, the check will fail. You can use the `prune` command to remove them.
+
+#### `Prune Hash Cache`
+
+To clean up stale entries in the local hash cache (for files that no longer exist):
+
+```bash
+backup-cli prune-cache
+```
+
+- `--dry-run`: Show what would be removed without actually removing anything.
+
+*Note: The `backup` command now automatically performs this cleanup, but this command can be used for manual maintenance.*
+
+#### `Version`
+
+To display the tool version:
+
+```bash
+backup-cli version
+# or
+backup-cli --version
+```
+
+#### `Remove Snapshot`
+
+To delete specific backup snapshots (e.g. to save space or remove sensitive data):
+
+```bash
+backup-cli remove <snapshot-id> [snapshot-id...]
+# Aliases: rm, forget, delete
+```
+
+The command automatically runs a `prune` operation afterwards to reclaim space used by the deleted snapshots' unique data.
+Use `--dry-run` to see what would be removed without applying changes.
+
+### Flags
+
+- `--root <path>`, `-d <path>`: Specify the root directory of the source to backup. Useful if running the tool from outside the source directory.
+- `--store <path>`, `-s <path>`: Specify the backup store directory directly. Useful for inspecting backups without needing a source directory.
+- `--yes`, `-y`: Automatically answer "yes" to prompts (e.g., confirming creation of `store.toml` when initializing a new store).
+- `--dry-run`: (For `backup` and `prune` commands) Perform a dry run without modifying the store.
+
+## Development
+
+- **Build**: `go build -o backup-cli ./cmd/backup`
+- **Test**: `go test ./...`
