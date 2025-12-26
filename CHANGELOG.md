@@ -11,6 +11,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - Windows compatibility: Fixed file locking issues during backup save operations.
 - Windows compatibility: Fixed integration tests to verify executable path with `.exe` extension.
+- Windows compatibility: Fixed path separator handling in ignore patterns (gitignore/backupignore).
+- Windows compatibility: Fixed TOML configuration generation to properly escape Windows paths.
+- Windows compatibility: Fixed headless snapshot listing by parsing project names from directory structure.
 
 ### Changed
 - Removed legacy "Java" related TODOs and comments from the codebase.

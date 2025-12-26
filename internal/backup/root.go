@@ -45,11 +45,12 @@ func (r *BackupRoot) String() string {
 	name := r.Time.Format("060102-150405")
 	if r.b.ProjectName == "" {
 		// Headless: check if we are in a subdirectory of StoreSnapshots
-		// r.BackupHead is absolute path to head file
-		// r.b.StoreSnapshots is absolute path to snapshots dir
-		rel, err := filepath.Rel(r.b.StoreSnapshots, filepath.Dir(r.BackupHead))
-		if err == nil && rel != "." {
-			return filepath.Join(rel, name)
+		// Structure: .../snapshots/<project>/<timestamp>
+		dir := filepath.Dir(r.BackupHead)
+		parent := filepath.Dir(dir)
+		if filepath.Base(parent) == "snapshots" {
+			projectName := filepath.Base(dir)
+			return filepath.Join(projectName, name)
 		}
 	}
 	return name

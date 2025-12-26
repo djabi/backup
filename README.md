@@ -6,6 +6,15 @@ A simple and efficient incremental backup tool written in Go.
 
 This tool allows you to create snapshots of a directory structure, storing them in a content-addressable storage format. It supports incremental backups (deduplication), **symbolic links**, listing backup history, inspecting backup contents, checking the status of your current workspace against the latest backup, and **hash cache verification** for data integrity.
 
+## Cross-Platform Support
+
+This tool supports **Linux**, **macOS**, and **Windows**.
+
+### Limitations
+- **Windows Symbolic Links**: Symbolic link support on Windows depends on developer mode or administrative privileges. If the tool lacks permission to create symlinks during restore, it may fail or skip them.
+- **File Permissions**: Unix-style file permissions (chmod) are preserved but may not map perfectly to Windows ACLs.
+- **Path Separators**: The tool automatically handles path separators, but when specifying paths in configuration files manually, use forward slashes `/` or escaped backslashes `\\` to ensure compatibility.
+
 ## Installation
 
 To build and install the tool, run the provided install script:

@@ -713,7 +713,7 @@ func runInit(path, store, project string) error {
 	}
 
 	configToml := filepath.Join(backupDir, "config.toml")
-	content := fmt.Sprintf("store = \"%s\"\nname = \"%s\"\n", store, project)
+	content := fmt.Sprintf("store = \"%s\"\nname = \"%s\"\n", filepath.ToSlash(store), project)
 	if err := os.WriteFile(configToml, []byte(content), 0644); err != nil {
 		return fmt.Errorf("failed to write config.toml: %w", err)
 	}

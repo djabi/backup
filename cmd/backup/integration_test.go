@@ -60,7 +60,7 @@ func TestIntegration(t *testing.T) {
 	}
 	configPath := filepath.Join(configDir, "config.toml")
 	projectName := "integration-test-proj"
-	configContent := fmt.Sprintf("store = \"%s\"\nname = \"%s\"", storeDir, projectName)
+	configContent := fmt.Sprintf("store = \"%s\"\nname = \"%s\"", filepath.ToSlash(storeDir), projectName)
 	if err := os.WriteFile(configPath, []byte(configContent), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -375,7 +375,7 @@ func TestIntegration(t *testing.T) {
 		t.Errorf("Auto-detection failed. Output: %s", out)
 	}
 	// Verify project name is shown (enhanced headless listing)
-	if !strings.Contains(out, "integration-test-proj/") {
+	if !strings.Contains(out, "integration-test-proj") {
 		t.Errorf("Headless listing should show project name. Output: %s", out)
 	}
 
@@ -577,7 +577,7 @@ func TestIntegration(t *testing.T) {
 	// Create source config
 	os.Mkdir(filepath.Join(ignoreDir, ".backup"), 0755)
 	var configContentStr string
-	configContentStr = fmt.Sprintf("store = \"%s\"\nname = \"ignore-test\"\n", ignoreStoreDir)
+	configContentStr = fmt.Sprintf("store = \"%s\"\nname = \"ignore-test\"\n", filepath.ToSlash(ignoreStoreDir))
 	os.WriteFile(filepath.Join(ignoreDir, ".backup", "config.toml"), []byte(configContentStr), 0644)
 
 	// Run Backup
@@ -623,7 +623,7 @@ func TestIntegration(t *testing.T) {
 	if !strings.Contains(out, "I ignored.txt (Ignored by .backupignore: ignored.txt)") {
 		t.Error("Status output missing ignored.txt reason")
 	}
-	if !strings.Contains(out, "I sub/sub_ignored.log (Ignored by .gitignore: *.log)") {
+	if !strings.Contains(out, fmt.Sprintf("I %s (Ignored by .gitignore: *.log)", filepath.FromSlash("sub/sub_ignored.log"))) {
 		t.Error("Status output missing sub_ignored.log reason")
 	}
 	// Ensure project dir exists

@@ -3,6 +3,7 @@ package backup
 import (
 	"bufio"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 )
@@ -93,6 +94,7 @@ func (m *IgnoreMatcher) Match(path string, isDir bool) (bool, *Pattern) {
 	if err != nil {
 		return false, nil // Should not happen if path is inside m.dir
 	}
+	relPath = filepath.ToSlash(relPath)
 
 	// Check local patterns in reverse order
 	for i := len(m.patterns) - 1; i >= 0; i-- {
@@ -160,6 +162,6 @@ func (m *IgnoreMatcher) Match(path string, isDir bool) (bool, *Pattern) {
 }
 
 func (m *IgnoreMatcher) globMatch(pattern, name string) bool {
-	matched, _ := filepath.Match(pattern, name)
+	matched, _ := path.Match(pattern, name)
 	return matched
 }
