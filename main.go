@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	"djabi.dev/go/backup/internal/backup"
+	"github.com/djabi/backup/internal/backup"
 	"github.com/urfave/cli/v2"
 )
 

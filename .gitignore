@@ -19,6 +19,9 @@ go.work
 
 # Project binary
 backup-cli
+backup
+backup-cli.exe
+backup.exe
 
 # OS specific checks
 .DS_Store

@@ -1,4 +1,4 @@
-module djabi.dev/go/backup
+module github.com/djabi/backup
 
 go 1.25.5
 
