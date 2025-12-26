@@ -51,7 +51,7 @@ name = "My Backup Project"
 ```
 
 **2. Store Configuration (`.backup/store.toml`)**
-Placed in the root of the backup store. This file is automatically created when you initialize a store (e.g., `backup-cli --store ./my-store ...`). It allows specific CLI commands to run from within the store directory without specifying the `--store` flag.
+Placed in the root of the backup store. This file is automatically created when you initialize a store (e.g., `backup --store ./my-store ...`). It allows specific CLI commands to run from within the store directory without specifying the `--store` flag.
 
 ### Ignoring Files
 
@@ -69,7 +69,7 @@ The tool supports ignoring files and directories using `.gitignore` and `.backup
 To initialize a new backup store:
 
 ```bash
-backup-cli init-store [path]
+backup init-store [path]
 ```
 
 This will also generate a `README.md` in the store directory with usage instructions.
@@ -78,7 +78,7 @@ This will also generate a `README.md` in the store directory with usage instruct
 To initialize a new source directory (project):
 
 ```bash
-backup-cli init [path] --store <store-path> --project <project-name>
+backup init [path] --store <store-path> --project <project-name>
 ```
 
 This will configure the directory as a backup source and generate a `README.md` in the `.backup` directory.
@@ -91,7 +91,7 @@ If flags are omitted, the tool will prompt interactively.
 To create a new backup snapshot:
 
 ```bash
-backup-cli backup
+backup backup
 ```
 
 Use `--dry-run` to simulate the backup without writing any changes.
@@ -101,9 +101,9 @@ Use `--dry-run` to simulate the backup without writing any changes.
 To list all available backup snapshots:
 
 ```bash
-backup-cli snapshots
+backup snapshots
 # or
-backup-cli snapshot
+backup snapshot
 ```
 
 #### List Snapshot Contents
@@ -111,13 +111,13 @@ backup-cli snapshot
 To list the contents of the latest backup:
 
 ```bash
-backup-cli tree
+backup tree
 ```
 
 To list the contents of a specific backup:
 
 ```bash
-backup-cli tree <timestamp>
+backup tree <timestamp>
 ```
 
 ### `Check Status`
@@ -125,7 +125,7 @@ backup-cli tree <timestamp>
 To see what has changed in your working directory compared to the latest backup:
 
 ```bash
-backup-cli status
+backup status
 ```
 
 - **Source Mode**: Shows files changed, new, or missing since the last backup. Output is sorted alphabetically.
@@ -136,7 +136,7 @@ backup-cli status
 To restore files from a snapshot:
 
 ```bash
-backup-cli restore <snapshot> [path] [destination]
+backup restore <snapshot> [path] [destination]
 ```
 
 - If running from source directory: destination defaults to current directory.
@@ -149,7 +149,7 @@ backup-cli restore <snapshot> [path] [destination]
 To verify the integrity of the backup store:
 
 ```bash
-backup-cli check
+backup check
 ```
 
 - `--deep`: Perform a deep check by verifying content hashes (slower).
@@ -165,7 +165,7 @@ The `check` command verifies:
 To remove unreferenced blobs and reclaim disk space:
 
 ```bash
-backup-cli prune
+backup prune
 ```
 
 - `--dry-run`: Show what would be deleted without actually removing any files.
@@ -176,7 +176,7 @@ The command also scans for and reports unreferenced blobs (blobs not referenced 
 To clean up stale entries in the local hash cache (for files that no longer exist):
 
 ```bash
-backup-cli prune-cache
+backup prune-cache
 ```
 
 - `--dry-run`: Show what would be removed without actually removing anything.
@@ -188,9 +188,9 @@ backup-cli prune-cache
 To display the tool version:
 
 ```bash
-backup-cli version
+backup version
 # or
-backup-cli --version
+backup --version
 ```
 
 #### `Remove Snapshot`
@@ -198,7 +198,7 @@ backup-cli --version
 To delete specific backup snapshots (e.g. to save space or remove sensitive data):
 
 ```bash
-backup-cli remove <snapshot-id> [snapshot-id...]
+backup remove <snapshot-id> [snapshot-id...]
 # Aliases: rm, forget, delete
 ```
 
@@ -214,5 +214,5 @@ Use `--dry-run` to see what would be removed without applying changes.
 
 ## Development
 
-- **Build**: `go build -o backup-cli ./cmd/backup`
+- **Build**: `go build -o backup`
 - **Test**: `go test ./...`
