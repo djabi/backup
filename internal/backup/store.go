@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type Store struct {
@@ -52,4 +53,30 @@ func (s *Store) GzipContentHash(gzipPath string) (string, error) {
 	}
 
 	return fmt.Sprintf("%x", hash.Sum(nil)), nil
+}
+
+// CleanupPartials removes any leftover .partial files in the store.
+// Returns the number of files removed.
+func (s *Store) CleanupPartials() (int, error) {
+	count := 0
+	err := filepath.Walk(s.b.StoreData, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err // Or return nil to continue? Better to report.
+		}
+		if !info.IsDir() && strings.HasSuffix(info.Name(), ".partial") {
+			if s.b.DryRun {
+				fmt.Printf("[dry-run] Would remove partial file: %s\n", path)
+				count++
+			} else {
+				if err := os.Remove(path); err != nil {
+					// Warn but continue
+					fmt.Fprintf(os.Stderr, "Warning: failed to remove partial file %s: %v\n", path, err)
+				} else {
+					count++
+				}
+			}
+		}
+		return nil
+	})
+	return count, err
 }

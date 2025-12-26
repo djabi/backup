@@ -17,13 +17,13 @@ This tool supports **Linux**, **macOS**, and **Windows**.
 
 ## Installation
 
-To build and install the tool, run the provided install script:
+To install the tool, use `go install` from the project root:
 
 ```bash
-./install.sh
+go install
 ```
 
-This will compile the project and install the binary as `backup-cli` to your `$GOPATH/bin` (or `$GOBIN`).
+This will compile the project and install the binary as `backup` (or `backup.exe` on Windows) to your `$GOPATH/bin` (or `$GOBIN`). Ensure this directory is in your system's `PATH`.
 
 ## Store Structure
 The backup store uses a Content-Addressable Storage (CAS) model to efficiently deduplicate data.

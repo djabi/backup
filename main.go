@@ -420,6 +420,13 @@ func runBackup(b *backup.Backup) error {
 		fmt.Println("Running in dry-run mode")
 	}
 
+	// Cleanup leftover partial files from previous runs
+	if cleaned, err := b.Store.CleanupPartials(); err != nil {
+		fmt.Fprintf(os.Stderr, "Warning: Failed to cleanup partial files: %v\n", err)
+	} else if cleaned > 0 {
+		fmt.Printf("Cleaned up %d leftover partial files from previous runs.\n", cleaned)
+	}
+
 	// Reset stats
 	b.Stats = backup.BackupStats{}
 

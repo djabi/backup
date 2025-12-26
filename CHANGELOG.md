@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - Windows compatibility: Fixed headless snapshot listing by parsing project names from directory structure.
 
 ### Changed
+- Flattened project structure: Moved `cmd/backup/*` to project root to simplify installation (`go install` from root).
 - Removed legacy "Java" related TODOs and comments from the codebase.
 
 ## [1.0.0] - 2025-12-25
