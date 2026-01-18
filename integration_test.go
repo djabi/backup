@@ -205,10 +205,12 @@ func TestIntegration(t *testing.T) {
 	// Actually, `FindBackupRoot` supports "proj/timestamp".
 	// But `snapshots` command calls `BackupRoots()` which lists `searchDir`.
 	// If we want to list snapshots for a project headless:
-	// We can't currently without config.
-	// We might need to add back `--name` flag later?
-	// OR: `backup-cli` should maybe auto-discover projects?
-	// Let's stick to what we have:
+	// We use the --name flag.
+	out = run(storeDir, "--store", storeDir, "snapshots", "--name", projectName)
+	if !strings.Contains(out, snapshot1) {
+		t.Errorf("Snapshots with --name flag failed to list snapshot %s. Output: %s", snapshot1, out)
+	}
+
 	// Try `restore` with explicit project path "integration-test-proj/<snap2>".
 
 	targetRestore := filepath.Join(tempDir, "restore_from_store")
