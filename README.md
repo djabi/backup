@@ -103,9 +103,9 @@ Use `--dry-run` to simulate the backup without writing any changes. Use `--show-
 To list all available backup snapshots:
 
 ```bash
+backup list
+# or (legacy)
 backup snapshots
-# or
-backup snapshot
 ```
 
 #### List Snapshot Contents

@@ -118,8 +118,8 @@ func main() {
 				},
 			},
 			{
-				Name:    "snapshots",
-				Aliases: []string{"snapshot", "list"},
+				Name:    "list",
+				Aliases: []string{"snapshot", "snapshots"},
 				Usage:   "List backup snapshots",
 				Action: func(c *cli.Context) error {
 					return runSnapshots(b)
@@ -794,7 +794,7 @@ Configuration is stored in ` + "`config.toml`" + `.
 ## Usage
 - **Backup**: Run ` + "`create`" + ` in this directory.
 - **Restore**: Run ` + "`create restore <snapshot_id>`" + `.
-- **List Snapshots**: Run ` + "`create snapshots`" + `.
+- **List Snapshots**: Run ` + "`create list`" + ` (or ` + "`create snapshots`" + `).
 
 For more information, visit: https://github.com/djabi/backup
 `
@@ -817,7 +817,7 @@ This directory is a backup store containing deduplicated data and snapshots.
 
 ## Usage
 - **Initialize Source**: ` + "`create init --store <path/to/this/store>`" + `
-- **List All Backups**: ` + "`create snapshots --store <path/to/this/store>`" + `
+- **List All Backups**: ` + "`create list --store <path/to/this/store>`" + `
 
 For more information, visit: https://github.com/djabi/backup
 `

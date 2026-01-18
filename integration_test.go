@@ -101,7 +101,7 @@ func TestIntegration(t *testing.T) {
 
 	// 4. Scenario: Listing Snapshots & Tree from Source Root
 	t.Log("--- Scenario 2: Listing ---")
-	out = run(srcDir, "snapshots")
+	out = run(srcDir, "list")
 	if !strings.Contains(out, snapshot1) {
 		t.Errorf("Snapshots output missing ID %s. Got: %s", snapshot1, out)
 	}
@@ -370,7 +370,7 @@ func TestIntegration(t *testing.T) {
 	t.Log("--- Scenario 11: Auto-detected Headless Operation ---")
 	// Run "snapshots" from storeDir without --store flag
 	// Must detect CWD as store
-	out = run(storeDir, "snapshots")
+	out = run(storeDir, "list")
 	if !strings.Contains(out, "snapshots found") {
 		t.Errorf("Auto-detection failed. Output: %s", out)
 	}

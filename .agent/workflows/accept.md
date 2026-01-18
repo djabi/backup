@@ -2,10 +2,18 @@
 description: Run before accepting task completion
 ---
 
-1. Run lint checks on all modified files.
-2. Ensure all tests pass
-3. Do a meticulous code review and ask what to do if there are issues. Pay attention to multi-platform support.
-4. Do meticulous documentation updates. Update CHANGELOG if needed.
-5. Run all tests again
-6. Check if any of the modified files should be not committed to the git repository.
-7. If git staged changes warrant this, update the tool version
+Pre-Commit Checklist
+
+Code Quality & Testing:
+- Run lint checks on all modified files.
+- Ensure all existing tests pass.
+- Write new tests to cover any fragile changes to prevent future regressions.
+
+Review & Documentation:
+- Perform a meticulous code review, paying close attention to multi-platform support, and address any identified issues.
+- Execute meticulous documentation updates. Update the CHANGELOG if necessary.
+
+Final Checks:
+- Run all tests a final time.
+- Review the modified files to ensure no unnecessary or temporary files are staged for commit.
+- Update the tool version if warranted by the staged changes.

@@ -15,7 +15,7 @@ All notable changes to this project will be documented in this file.
 - GitHub Actions workflow for cross-OS testing (Linux, macOS, Windows).
 
 ### Changed
-- Renamed `backup` command to `create` for clarity, with `backup` retained as an alias for backward compatibility.
+- Renamed `backup` command to `create` and `snapshots` to `list` for clarity, with old names retained as aliases.
 - Refactored directory structure: Moved source files from `internal/backup` to `internal` to avoid naming conflicts.
 - Flattened project structure: Moved `cmd/backup/*` to project root to simplify installation (`go install` from root).
 - Removed legacy "Java" related TODOs and comments from the codebase.
