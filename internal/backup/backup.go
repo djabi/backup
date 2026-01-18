@@ -25,8 +25,10 @@ type Backup struct {
 type BackupStats struct {
 	FilesTotal    int
 	FilesArchived int
+	FilesIgnored  int
 	DirsTotal     int
 	DirsArchived  int
+	DirsIgnored   int
 	BytesArchived int64
 	BytesTotal    int64
 }

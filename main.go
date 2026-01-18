@@ -501,8 +501,8 @@ func runBackup(b *backup.Backup) error {
 	}
 
 	fmt.Println("\nBackup Summary:")
-	fmt.Printf("  Files:       %d total, %d archived\n", b.Stats.FilesTotal, b.Stats.FilesArchived)
-	fmt.Printf("  Directories: %d total, %d archived\n", b.Stats.DirsTotal, b.Stats.DirsArchived)
+	fmt.Printf("  Files:       %d total, %d archived, %d ignored\n", b.Stats.FilesTotal, b.Stats.FilesArchived, b.Stats.FilesIgnored)
+	fmt.Printf("  Directories: %d total, %d archived, %d ignored\n", b.Stats.DirsTotal, b.Stats.DirsArchived, b.Stats.DirsIgnored)
 	fmt.Printf("  Bytes:       %d archived\n", b.Stats.BytesArchived)
 
 	return nil

@@ -19,7 +19,6 @@ go.work
 
 # Project binary
 backup-cli
-backup
 backup-cli.exe
 backup.exe
 
