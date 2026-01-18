@@ -18,7 +18,7 @@ func main() {
 	app := &cli.App{
 		Name:    "backup",
 		Usage:   "Content-addressable backup tool with deduplication, incremental backups, and integrity verification",
-		Version: "1.0.0",
+		Version: "1.1.0",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "root",
@@ -98,8 +98,9 @@ func main() {
 				},
 			},
 			{
-				Name:  "backup",
-				Usage: "Create a new backup",
+				Name:    "create",
+				Aliases: []string{"backup"},
+				Usage:   "Create a new backup",
 				Flags: []cli.Flag{
 					&cli.BoolFlag{
 						Name:  "dry-run",
@@ -398,7 +399,7 @@ func printTree(dir *backup.BackupDirectory, prefix string) error {
 
 func runBackup(b *backup.Backup) error {
 	if b.Top == "" {
-		msg := "Run 'backup' from a source directory. Current directory is not initialized."
+		msg := "Run 'create' from a source directory. Current directory is not initialized."
 		if b.StoreRoot != "" {
 			msg += fmt.Sprintf("\nIt looks like you are running inside a store directory: %s", b.StoreRoot)
 		}
@@ -786,9 +787,9 @@ This directory is configured as a backup source.
 Configuration is stored in ` + "`config.toml`" + `.
 
 ## Usage
-- **Backup**: Run ` + "`backup`" + ` in this directory.
-- **Restore**: Run ` + "`backup restore <snapshot_id>`" + `.
-- **List Snapshots**: Run ` + "`backup snapshots`" + `.
+- **Backup**: Run ` + "`create`" + ` in this directory.
+- **Restore**: Run ` + "`create restore <snapshot_id>`" + `.
+- **List Snapshots**: Run ` + "`create snapshots`" + `.
 
 For more information, visit: https://github.com/djabi/backup
 `
@@ -810,8 +811,8 @@ This directory is a backup store containing deduplicated data and snapshots.
 - ` + "`snapshots/`" + `: Contains snapshot references organized by project.
 
 ## Usage
-- **Initialize Source**: ` + "`backup init --store <path/to/this/store>`" + `
-- **List All Backups**: ` + "`backup snapshots --store <path/to/this/store>`" + `
+- **Initialize Source**: ` + "`create init --store <path/to/this/store>`" + `
+- **List All Backups**: ` + "`create snapshots --store <path/to/this/store>`" + `
 
 For more information, visit: https://github.com/djabi/backup
 `

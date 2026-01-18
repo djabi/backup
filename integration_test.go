@@ -80,7 +80,7 @@ func TestIntegration(t *testing.T) {
 	// 3. Scenario: Backup from Source Root
 	t.Log("--- Scenario 1: Initial Backup from Source Root ---")
 	// Use --yes to confirm store.toml creation (Global flag must be before subcommand)
-	out := run(srcDir, "--yes", "backup")
+	out := run(srcDir, "--yes", "create")
 	t.Logf("Backup Output: %s", out)
 
 	snapshot1 := parseSnapshotID(t, out)
@@ -122,7 +122,7 @@ func TestIntegration(t *testing.T) {
 
 	// Run backup from subDir
 	// Should find root via .backup lookup
-	out = run(subDir, "backup")
+	out = run(subDir, "create")
 	t.Logf("Backup (Subdir) Output: %s", out)
 
 	snapshot2 := parseSnapshotID(t, out)
@@ -246,7 +246,7 @@ func TestIntegration(t *testing.T) {
 		}
 
 		// Backup again to catch the link
-		out = run(srcDir, "backup")
+		out = run(srcDir, "create")
 		snapshot3 := parseSnapshotID(t, out)
 
 		// Verify status doesn't panic with symlink
@@ -447,7 +447,7 @@ func TestIntegration(t *testing.T) {
 	if err == nil {
 		t.Error("Backup from store directory should have failed")
 	}
-	if !strings.Contains(out, "Run 'backup' from a source directory") {
+	if !strings.Contains(out, "Run 'create' from a source directory") {
 		t.Errorf("Error message missing expected text. Got: %s", out)
 	}
 	if !strings.Contains(out, "running inside a store directory") {

@@ -46,7 +46,7 @@ The tool uses a configuration file to locate the backup store and define project
 Placed in the root of the source tree to be backed up:
 
 ```toml
-store = "/path/to/backup/store"
+store = "~/path/to/backup/store"  # Supports ~ expansion
 name = "My Backup Project"
 ```
 
@@ -91,6 +91,8 @@ If flags are omitted, the tool will prompt interactively.
 To create a new backup snapshot:
 
 ```bash
+backup create
+# or (legacy)
 backup backup
 ```
 
@@ -128,7 +130,7 @@ To see what has changed in your working directory compared to the latest backup:
 backup status
 ```
 
-- **Source Mode**: Shows files changed, new, or missing since the last backup. Output is sorted alphabetically.
+- **Source Mode**: Shows files changed, new, or missing since the last backup. Output is sorted alphabetically. Use `--show-ignored` to see files skipped by ignore rules.
 - **Headless Mode**: Lists all projects in the store, sorted by recency, with smart relative timestamps (e.g., "Just now", "2 hours ago").
 
 #### `Restore Backup`
