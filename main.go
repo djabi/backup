@@ -121,8 +121,14 @@ func main() {
 				Name:    "snapshots",
 				Aliases: []string{"snapshot", "list"},
 				Usage:   "List backup snapshots",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:  "name",
+						Usage: "Project name (for headless mode)",
+					},
+				},
 				Action: func(c *cli.Context) error {
-					return runSnapshots(b)
+					return runSnapshots(b, c.String("name"))
 				},
 			},
 			{
@@ -316,7 +322,10 @@ func main() {
 	}
 }
 
-func runSnapshots(b *internal.Backup) error {
+func runSnapshots(b *internal.Backup, projectName string) error {
+	if projectName != "" {
+		b.ProjectName = projectName
+	}
 	roots, err := b.BackupRoots()
 	if err != nil {
 		return fmt.Errorf("failed to list backups: %w", err)
