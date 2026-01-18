@@ -1003,11 +1003,83 @@ func TestIntegration(t *testing.T) {
 	if !strings.Contains(out, "backup-cli version 1.0.0") {
 		t.Errorf("Version command output incorrect: %s", out)
 	}
-	out = run(srcDir, "--version")
-	if !strings.Contains(out, "backup version 1.0.0") {
-		// cli default version text might differ
-		// "backup version 1.0.0"
+
+	// 28. Scenario: Tilde Expansion in Config
+	t.Log("--- Scenario 28: Tilde Expansion in Config ---")
+	home, _ := os.UserHomeDir()
+	tildeStoreDir := filepath.Join(home, "backup_integration_tilde_test")
+	os.RemoveAll(tildeStoreDir)
+	defer os.RemoveAll(tildeStoreDir)
+
+	// Init store at tilde location
+	run(srcDir, "init-store", tildeStoreDir)
+
+	// Create new source with tilde in config
+	srcTildeDir := filepath.Join(tempDir, "src_tilde")
+	os.MkdirAll(srcTildeDir, 0755)
+	os.MkdirAll(filepath.Join(srcTildeDir, ".backup"), 0755)
+	tildeConfig := fmt.Sprintf("store = \"~/backup_integration_tilde_test\"\nname = \"tilde-proj\"\n")
+	os.WriteFile(filepath.Join(srcTildeDir, ".backup", "config.toml"), []byte(tildeConfig), 0644)
+
+	// Run backup - should expand tilde and succeed
+	out = run(srcTildeDir, "backup")
+	if !strings.Contains(out, "Backup completed successfully") {
+		t.Errorf("Backup with tilde path failed: %s", out)
 	}
+
+	// 29. Scenario: Init Validation and Overlap Prevention
+	t.Log("--- Scenario 29: Init Validation and Overlap Prevention ---")
+
+	// Use fresh directories to avoid "already initialized" errors
+	testBase := filepath.Join(tempDir, "overlap_test")
+	os.MkdirAll(testBase, 0755)
+
+	srcOverlap := filepath.Join(testBase, "src")
+	os.MkdirAll(srcOverlap, 0755)
+
+	// Test Overlap: Store inside Source
+	overlapStore := filepath.Join(srcOverlap, "nested_store")
+	cmd = exec.Command(binPath, "init", "--store", overlapStore, "--project", "overlap", srcOverlap)
+	outBytes, err = cmd.CombinedOutput()
+	if err == nil {
+		t.Error("Init should have failed for overlapping directories (store inside source)")
+	}
+	if !strings.Contains(string(outBytes), "cannot overlap") {
+		t.Errorf("Expected overlap error, got: %s", string(outBytes))
+	}
+
+	// Test Overlap: Source inside Store
+	overlapStoreRoot := filepath.Join(testBase, "store")
+	os.MkdirAll(overlapStoreRoot, 0755)
+	// We need a valid store for the source-inside-store test to reach validity check?
+	// Actually overlap check happens before validity check.
+
+	overlapSource := filepath.Join(overlapStoreRoot, "nested_source")
+	cmd = exec.Command(binPath, "init", "--store", overlapStoreRoot, "--project", "overlap", overlapSource)
+	outBytes, err = cmd.CombinedOutput()
+	if err == nil {
+		t.Error("Init should have failed for overlapping directories (source inside store)")
+	}
+	if !strings.Contains(string(outBytes), "cannot overlap") {
+		t.Errorf("Expected overlap error, got: %s", string(outBytes))
+	}
+
+	// Test Invalid Store (missing store.toml)
+	invalidStore := filepath.Join(tempDir, "empty_dir_not_a_store")
+	os.MkdirAll(invalidStore, 0755)
+	srcNew := filepath.Join(tempDir, "src_new_valid")
+	os.MkdirAll(srcNew, 0755)
+	cmd = exec.Command(binPath, "init", "--store", invalidStore, "--project", "invalid", srcNew)
+	outBytes, err = cmd.CombinedOutput()
+	if err == nil {
+		t.Error("Init should have failed for invalid store (no store.toml)")
+	}
+	if !strings.Contains(string(outBytes), "not a valid backup store") {
+		t.Errorf("Expected invalid store error, got: %s", string(outBytes))
+	}
+
+	// Cleanup tilde test dir from home
+	os.RemoveAll(tildeStoreDir)
 }
 
 func parseSnapshotID(t *testing.T, output string) string {

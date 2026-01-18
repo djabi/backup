@@ -37,7 +37,11 @@ func NewBackup(startDir, storeDir string, assumeYes bool) (*Backup, error) {
 
 	// 1. Determine StoreRoot if provided explicitly
 	if storeDir != "" {
-		b.StoreRoot, err = filepath.Abs(storeDir)
+		expanded, err := ExpandPath(storeDir)
+		if err != nil {
+			return nil, err
+		}
+		b.StoreRoot, err = filepath.Abs(expanded)
 		if err != nil {
 			return nil, err
 		}
@@ -86,10 +90,14 @@ func NewBackup(startDir, storeDir string, assumeYes bool) (*Backup, error) {
 				if b.StoreRoot == "" {
 					backupStoreSetting := b.Config.Store
 					if backupStoreSetting != "" {
-						if filepath.IsAbs(backupStoreSetting) {
-							b.StoreRoot = backupStoreSetting
+						expanded, err := ExpandPath(backupStoreSetting)
+						if err != nil {
+							return nil, err
+						}
+						if filepath.IsAbs(expanded) {
+							b.StoreRoot = expanded
 						} else {
-							b.StoreRoot = filepath.Join(top, backupStoreSetting)
+							b.StoreRoot = filepath.Join(top, expanded)
 						}
 						// Canonize path
 						b.StoreRoot, err = filepath.Abs(b.StoreRoot)

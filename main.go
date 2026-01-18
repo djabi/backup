@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/djabi/backup/internal/backup"
@@ -705,6 +706,45 @@ func runInit(path, store, project string) error {
 			return fmt.Errorf("store path required")
 		}
 	}
+
+	// 1. Expand and Abs store path
+	expandedStore, err := backup.ExpandPath(store)
+	if err != nil {
+		return fmt.Errorf("invalid store path: %w", err)
+	}
+	absStore, err := filepath.Abs(expandedStore)
+	if err != nil {
+		return fmt.Errorf("failed to get absolute path for store: %w", err)
+	}
+
+	// 2. Overlap Check
+	relToStore, err1 := filepath.Rel(absStore, absPath)
+	relToSource, err2 := filepath.Rel(absPath, absStore)
+	if (err1 == nil && !strings.HasPrefix(relToStore, "..") && relToStore != "..") ||
+		(err2 == nil && !strings.HasPrefix(relToSource, "..") && relToSource != "..") {
+		return fmt.Errorf("source directory and store directory cannot overlap:\n  Source: %s\n  Store:  %s", absPath, absStore)
+	}
+
+	// 3. Store Existence Check
+	if _, err := os.Stat(absStore); os.IsNotExist(err) {
+		fmt.Printf("Store directory %s does not exist. Create it? [y/N] ", absStore)
+		var response string
+		fmt.Scanln(&response)
+		if response == "y" || response == "Y" || response == "yes" {
+			if err := runInitStore(absStore); err != nil {
+				return fmt.Errorf("failed to initialize store: %w", err)
+			}
+		} else {
+			return fmt.Errorf("store directory does not exist")
+		}
+	}
+
+	// 4. Store Validity Check
+	storeToml := filepath.Join(absStore, ".backup", "store.toml")
+	if _, err := os.Stat(storeToml); os.IsNotExist(err) {
+		return fmt.Errorf("directory %s is not a valid backup store (missing .backup/store.toml)", absStore)
+	}
+
 	if project == "" {
 		project = filepath.Base(absPath)
 		fmt.Printf("Enter project name [%s]: ", project)
