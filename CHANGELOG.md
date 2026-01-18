@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Enhanced `init` command with store existence check, auto-creation prompt, and validity verification.
 - Overlap prevention: `init` now blocks if source and store directories overlap.
 - Count of ignored files and directories in backup summary.
+- Support for `--show-ignored` in `create` command to list skipped files during backup.
 - Global exclude patterns in `config.toml`.
 - Automatic creation of `README.md` files in backup sources and stores for better usability.
 - GitHub Actions workflow for cross-OS testing (Linux, macOS, Windows).

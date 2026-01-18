@@ -19,6 +19,7 @@ type Backup struct {
 	Store             *Store
 	HashCache         *HashCache
 	DryRun            bool
+	ShowIgnored       bool
 	Stats             BackupStats
 }
 

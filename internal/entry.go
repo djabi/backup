@@ -268,6 +268,15 @@ func (e *DirectoryEntry) scan() error {
 				} else {
 					e.b.Stats.FilesIgnored++
 				}
+
+				if e.b.ShowIgnored {
+					reason := ""
+					if pattern != nil {
+						reason = fmt.Sprintf(" (Ignored by %s: %s)", pattern.Source, pattern.raw)
+					}
+					relName, _ := filepath.Rel(e.b.Top, fullPath)
+					fmt.Printf("I %s%s\n", relName, reason)
+				}
 				continue
 			}
 		}
@@ -287,6 +296,15 @@ func (e *DirectoryEntry) scan() error {
 						Name:   f.Name(),
 						Reason: pattern,
 					})
+
+					if e.b.ShowIgnored {
+						reason := ""
+						if pattern != nil {
+							reason = fmt.Sprintf(" (Ignored by %s: %s)", pattern.Source, pattern.raw)
+						}
+						relName, _ := filepath.Rel(e.b.Top, fullPath)
+						fmt.Printf("I %s%s\n", relName, reason)
+					}
 					continue
 				}
 			}

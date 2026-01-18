@@ -106,9 +106,14 @@ func main() {
 						Name:  "dry-run",
 						Usage: "Perform a dry run without writing changes",
 					},
+					&cli.BoolFlag{
+						Name:  "show-ignored",
+						Usage: "Show files and directories that are ignored",
+					},
 				},
 				Action: func(c *cli.Context) error {
 					b.DryRun = c.Bool("dry-run")
+					b.ShowIgnored = c.Bool("show-ignored")
 					return runBackup(b)
 				},
 			},

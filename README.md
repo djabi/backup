@@ -96,7 +96,7 @@ backup create
 backup backup
 ```
 
-Use `--dry-run` to simulate the backup without writing any changes.
+Use `--dry-run` to simulate the backup without writing any changes. Use `--show-ignored` to list files and directories skipped by ignore rules.
 
 #### List Snapshots
 
