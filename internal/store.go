@@ -1,4 +1,4 @@
-package backup
+package internal
 
 import (
 	"compress/gzip"

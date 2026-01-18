@@ -1000,7 +1000,7 @@ func TestIntegration(t *testing.T) {
 	// 27. Scenario: Version Command
 	t.Log("--- Scenario 27: Version Command ---")
 	out = run(srcDir, "version")
-	if !strings.Contains(out, "backup-cli version 1.0.0") {
+	if !strings.Contains(out, "version 1.1.0") {
 		t.Errorf("Version command output incorrect: %s", out)
 	}
 

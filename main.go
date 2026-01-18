@@ -8,12 +8,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/djabi/backup/internal/backup"
+	"github.com/djabi/backup/internal"
 	"github.com/urfave/cli/v2"
 )
 
 func main() {
-	var b *backup.Backup
+	var b *internal.Backup
 
 	app := &cli.App{
 		Name:    "backup",
@@ -45,7 +45,7 @@ func main() {
 			root := c.String("root")
 			store := c.String("store")
 			assumeYes := c.Bool("yes")
-			b, err = backup.NewBackup(root, store, assumeYes)
+			b, err = internal.NewBackup(root, store, assumeYes)
 			if err != nil {
 				return fmt.Errorf("error initializing backup: %w", err)
 			}
@@ -311,7 +311,7 @@ func main() {
 	}
 }
 
-func runSnapshots(b *backup.Backup) error {
+func runSnapshots(b *internal.Backup) error {
 	roots, err := b.BackupRoots()
 	if err != nil {
 		return fmt.Errorf("failed to list backups: %w", err)
@@ -329,8 +329,8 @@ func runSnapshots(b *backup.Backup) error {
 	return nil
 }
 
-func runTree(b *backup.Backup, rootName string) error {
-	var root *backup.BackupRoot
+func runTree(b *internal.Backup, rootName string) error {
+	var root *internal.BackupRoot
 	var err error
 
 	if rootName == "" {
@@ -368,7 +368,7 @@ func runTree(b *backup.Backup, rootName string) error {
 	return printTree(top, "")
 }
 
-func printTree(dir *backup.BackupDirectory, prefix string) error {
+func printTree(dir *internal.BackupDirectory, prefix string) error {
 	entries, err := dir.Entries()
 	if err != nil {
 		return err
@@ -385,19 +385,19 @@ func printTree(dir *backup.BackupDirectory, prefix string) error {
 		entry := entries[name]
 		// D or F ?
 		// We can check type assertions
-		if d, ok := entry.(*backup.BackupDirectory); ok {
+		if d, ok := entry.(*internal.BackupDirectory); ok {
 			fmt.Printf("%s%s/ (%s)\n", prefix, name, d.Hash()[:7]) // Short hash
 			if err := printTree(d, prefix+"  "); err != nil {
 				return err
 			}
-		} else if f, ok := entry.(*backup.BackupFile); ok {
+		} else if f, ok := entry.(*internal.BackupFile); ok {
 			fmt.Printf("%s%s (%s)\n", prefix, name, f.Hash()[:7])
 		}
 	}
 	return nil
 }
 
-func runBackup(b *backup.Backup) error {
+func runBackup(b *internal.Backup) error {
 	if b.Top == "" {
 		msg := "Run 'create' from a source directory. Current directory is not initialized."
 		if b.StoreRoot != "" {
@@ -430,9 +430,9 @@ func runBackup(b *backup.Backup) error {
 	}
 
 	// Reset stats
-	b.Stats = backup.BackupStats{}
+	b.Stats = internal.BackupStats{}
 
-	top := backup.NewDirectoryEntry(b, b.Top, nil)
+	top := internal.NewDirectoryEntry(b, b.Top, nil)
 
 	if err := top.Save(); err != nil {
 		return fmt.Errorf("backup failed: %w", err)
@@ -509,9 +509,9 @@ func runBackup(b *backup.Backup) error {
 	return nil
 }
 
-func runRestore(b *backup.Backup, snapshotName, pathInside, dest string) error {
+func runRestore(b *internal.Backup, snapshotName, pathInside, dest string) error {
 	// 1. Locate backup root
-	var root *backup.BackupRoot
+	var root *internal.BackupRoot
 	var err error
 
 	root, err = b.FindBackupRoot(snapshotName)
@@ -581,7 +581,7 @@ func runRestore(b *backup.Backup, snapshotName, pathInside, dest string) error {
 	return nil
 }
 
-func runRemove(b *backup.Backup, snapshots []string) error {
+func runRemove(b *internal.Backup, snapshots []string) error {
 	for _, name := range snapshots {
 		// Verify existence
 		root, err := b.FindBackupRoot(name)
@@ -625,7 +625,7 @@ func runRemove(b *backup.Backup, snapshots []string) error {
 	return nil
 }
 
-func runPruneCache(b *backup.Backup, dryRun bool) error {
+func runPruneCache(b *internal.Backup, dryRun bool) error {
 	if dryRun {
 		fmt.Println("[dry-run] Checking hash cache...")
 	} else {
@@ -709,7 +709,7 @@ func runInit(path, store, project string) error {
 	}
 
 	// 1. Expand and Abs store path
-	expandedStore, err := backup.ExpandPath(store)
+	expandedStore, err := internal.ExpandPath(store)
 	if err != nil {
 		return fmt.Errorf("invalid store path: %w", err)
 	}

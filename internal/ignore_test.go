@@ -1,4 +1,4 @@
-package backup
+package internal
 
 import (
 	"path/filepath"
